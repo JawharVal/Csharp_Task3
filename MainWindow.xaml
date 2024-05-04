@@ -1,0 +1,113 @@
+﻿<Window x:Class="WpfApp10.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:WpfApp10"
+        xmlns:local="clr-namespace:WpfApp10"
+        ResizeMode="CanResize" Title="Осветительные приборы" Topmost="True" Height="700" Width="512" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+    <Window.Resources>
+        <local:BoolToStringConverter x:Key="BoolToStringConverter"/>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <local:LampTemplateSelector x:Key="LampTemplateSelector">
+            <local:LampTemplateSelector.LanternTemplate>
+                
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Type}" FontWeight="Bold"/>
+                        <Canvas>
+                            <Ellipse Width="10" Height="10" Fill="{Binding LampColor}" Canvas.Left="45" Canvas.Top="-12"/>
+                        </Canvas>
+                        <Button Content="Turn On" Command="{Binding TurnOnCommand}" IsEnabled="{Binding IsOn, Converter={StaticResource InverseBooleanConverter}}"/>
+                        <Button Content="Turn Off" Command="{Binding TurnOffCommand}" IsEnabled="{Binding IsOn}"/>
+                        <TextBlock Text="Status:"/>
+                        <TextBlock Text="{Binding IsOn, StringFormat=Is On: {0}}" />
+                        <TextBlock Text="{Binding IsBroken, StringFormat=Is Broken: {0}}" />
+                        <StackPanel Height="20"/>
+                    </StackPanel>
+                </DataTemplate>
+            </local:LampTemplateSelector.LanternTemplate>
+            <local:LampTemplateSelector.TableLampTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Canvas>
+                            <Ellipse Width="10" Height="10" Fill="{Binding LampColor}" Canvas.Left="31" Canvas.Top="4"/>
+                            <Ellipse Width="10" Height="10" Fill="{Binding LampColorss}" Canvas.Left="46" Canvas.Top="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                        </Canvas>
+                        <TextBlock Text="{Binding Type}" FontWeight="Bold"/>
+                        <Button Content="Turn On" Command="{Binding TurnOnCommand}" IsEnabled="{Binding IsOn, Converter={StaticResource InverseBooleanConverter}}"/>
+                        <Button Content="Turn Off" Command="{Binding TurnOffCommand}" IsEnabled="{Binding IsOn}"/>
+                        <Button Content="Connect/Disconnect" Command="{Binding ToggleNetworkConnectionCommand}"/>
+                        <TextBlock Text="Status:"/>
+                        <TextBlock Text="{Binding IsOn, StringFormat=Is On: {0}}" />
+                        <TextBlock Text="{Binding IsBroken, StringFormat=Is Broken: {0}}" />
+                        <TextBlock Text="{Binding IsConnectedToNetwork, Converter={StaticResource BoolToStringConverter}, StringFormat=Network Connection: {0}}" />
+                        <StackPanel Height="20"/>
+                    </StackPanel>
+                </DataTemplate>
+            </local:LampTemplateSelector.TableLampTemplate>
+            <local:LampTemplateSelector.ChandelierTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Type}" FontWeight="Bold"/>
+                        <Canvas>
+                            <Ellipse Width="10" Height="10" Fill="{Binding LampColor}" Canvas.Left="61" Canvas.Top="-12" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Ellipse Canvas.Left="78" Canvas.Top="-12" Width="10" Height="10" Fill="{Binding LampColor1}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <Ellipse Canvas.Left="93" Canvas.Top="-12" Width="10" Height="10" Fill="{Binding LampColor2}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Canvas>
+                        <Button Content="Turn On" Command="{Binding TurnOnCommand}" IsEnabled="{Binding CanTurnOn}"/>
+                        <Button Content="Turn Off" Command="{Binding TurnOffCommand}" IsEnabled="{Binding CanTurnOff}"/>
+                        <TextBlock Text="Status:"/>
+                        <TextBlock Text="{Binding IsOn, StringFormat=Is On: {0}}" />
+                        <TextBlock Text="{Binding IsBroken, StringFormat=Is Broken: {0}}" />
+                        <TextBlock Text="{Binding CurrentMode, StringFormat=Current Mode: {0}}" />
+                        <StackPanel Height="20"/>
+                    </StackPanel>
+                </DataTemplate>
+            </local:LampTemplateSelector.ChandelierTemplate>
+            <local:LampTemplateSelector.FloorLampTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Type}" FontWeight="Bold"/>
+                        <Canvas>
+                            <Ellipse Width="10" Height="10" Fill="{Binding LampColor}" Canvas.Left="31" Canvas.Top="-11"/>
+                            <Ellipse Width="10" Height="10" Fill="{Binding LampColorss}" Canvas.Left="46" Canvas.Top="-11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Canvas>
+                        <Button Content="Turn On" Command="{Binding TurnOnCommand}" IsEnabled="{Binding IsOn, Converter={StaticResource InverseBooleanConverter}}"/>
+                        <Button Content="Turn Off" Command="{Binding TurnOffCommand}" IsEnabled="{Binding IsOn}"/>
+                        <Button Content="Connect/Disconnect" Command="{Binding ToggleNetworkConnectionCommand}"/>
+                        <TextBlock Text="Status:"/>
+                        <TextBlock Text="{Binding IsOn, StringFormat=Is On: {0}}" />
+                        <TextBlock Text="{Binding IsBroken, StringFormat=Is Broken: {0}}" />
+                        <TextBlock Text="{Binding IsConnectedToNetwork, Converter={StaticResource BoolToStringConverter}, StringFormat=Network Connection: {0}}" />
+                    </StackPanel>
+                </DataTemplate>
+            </local:LampTemplateSelector.FloorLampTemplate>
+        </local:LampTemplateSelector>
+    </Window.Resources>
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <StackPanel>
+            <Label Content="DLL Path:" FontWeight="Bold"/>
+            <TextBox Text="{Binding DllPath, UpdateSourceTrigger=PropertyChanged}" ToolTip="Enter the path to the DLL file here."/>
+            <Button Content="Load DLL" Command="{Binding LoadAssemblyCommand}" />
+
+            <Label Content="Available Classes:" FontWeight="Bold"/>
+            <ListBox ItemsSource="{Binding Types}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedType}"/>
+
+            <Label Content="Available Methods:" FontWeight="Bold"/>
+            <ListBox ItemsSource="{Binding Methods}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedMethod}"/>
+
+            <Label Content="Enter Method Parameters (comma separated):" FontWeight="Bold"/>
+            <TextBox Text="{Binding MethodParameters}" />
+            <Button Content="Execute" Command="{Binding InvokeMethodCommand}" />
+
+            <Label Content="Operation Log:" FontWeight="Bold"/>
+            <TextBox Text="{Binding Log}" Height="100" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+
+            <!-- Display the lamps -->
+            <ItemsControl ItemsSource="{Binding LightingFixtures}" ItemTemplateSelector="{StaticResource LampTemplateSelector}" />
+        </StackPanel>
+    </ScrollViewer>
+</Window>
